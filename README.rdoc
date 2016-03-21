@@ -1,6 +1,6 @@
 READ ME
 
-A tumblr clone for practice
+A tumblr clone for practice using Ruby on Rails
 
 Goals:
 - Simple User Authentication using Devise (Sign in, Sign out)
