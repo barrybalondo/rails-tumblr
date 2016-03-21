@@ -1,5 +1,8 @@
 class PostsController < ApplicationController
 	before_action :authenticate_user!, 	except: [:index, :show]
+	before_action :find_post, only: [:show, :edit, :update, :destroy]
+	before_action :require_same_user, only: [:edit, :update, :destroy]
+
 
 	def index
 		@posts = Post.all.order('created_at DESC')
@@ -11,7 +14,7 @@ class PostsController < ApplicationController
 
 	def create
 		@post = Post.new(post_params)
-
+		@post.user_id = current_user.id
 		if @post.save
 			redirect_to @post
 		else
@@ -20,15 +23,12 @@ class PostsController < ApplicationController
 	end
 
 	def show
-		@post = Post.find(params[:id])
 	end
 
 	def edit
-		@post = Post.find(params[:id])
 	end
 
 	def update
-		@post = Post.find(params[:id])
 		if @post.update(params.require(:post).permit(:title, :body))
 			redirect_to @post
 		else
@@ -37,7 +37,6 @@ class PostsController < ApplicationController
 	end
 
 	def destroy
-		@post = Post.find(params[:id])
 		@post.destroy
 
 		redirect_to root_path
@@ -51,7 +50,18 @@ class PostsController < ApplicationController
 		end
 
 		def find_post
-			Post.find(params[:id])
+			@post = Post.find(params[:id])
 		end
+
+		def require_same_user
+      # set restriction for editing articles only to the one created them
+      if current_user.id != @post.user_id
+        flash = "You can only edit or delete your own post"
+        redirect_to root_path
+      end
+    end
+
+
+
 
 end
